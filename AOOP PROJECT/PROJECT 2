@@ -1,0 +1,114 @@
+// Abstract class for Approver
+abstract class Approver {
+    protected Approver nextApprover;
+
+    public void setNextApprover(Approver nextApprover) {
+        this.nextApprover = nextApprover;
+    }
+
+    public void processExpense(ExpenseClaim claim) {
+        if (canApprove(claim)) {
+            System.out.println(this.getClass().getSimpleName() + " approved the expense: " + claim.getDescription() + " for $" + claim.getAmount());
+            claim.setStatus("Approved by " + this.getClass().getSimpleName());
+        } else if (nextApprover != null) {
+            nextApprover.processExpense(claim);
+        } else {
+            System.out.println("No one could approve the expense: " + claim.getDescription() + " for $" + claim.getAmount());
+            claim.setStatus("Rejected");
+        }
+    }
+
+    protected abstract boolean canApprove(ExpenseClaim claim);
+}
+
+// Concrete classes for Approvers
+class Employee extends Approver {
+    @Override
+    protected boolean canApprove(ExpenseClaim claim) {
+        return claim.getAmount() <= 100;
+    }
+}
+
+class Supervisor extends Approver {
+    @Override
+    protected boolean canApprove(ExpenseClaim claim) {
+        return claim.getAmount() <= 500;
+    }
+}
+
+class Manager extends Approver {
+    @Override
+    protected boolean canApprove(ExpenseClaim claim) {
+        return claim.getAmount() <= 2000;
+    }
+}
+
+class Director extends Approver {
+    @Override
+    protected boolean canApprove(ExpenseClaim claim) {
+        return claim.getAmount() <= 5000;
+    }
+}
+
+// Class for Expense Claims
+class ExpenseClaim {
+    private String description;
+    private double amount;
+    private String status;
+
+    public ExpenseClaim(String description, double amount) {
+        this.description = description;
+        this.amount = amount;
+        this.status = "Pending";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}
+
+// Main class to simulate the Expense Reimbursement System
+public class ExpenseReimbursementSystem {
+    public static void main(String[] args) {
+        // Setting up the approval chain
+        Approver employee = new Employee();
+        Approver supervisor = new Supervisor();
+        Approver manager = new Manager();
+        Approver director = new Director();
+
+        employee.setNextApprover(supervisor);
+        supervisor.setNextApprover(manager);
+        manager.setNextApprover(director);
+
+        // Test cases for expense claims
+        testExpenseApproval(employee, new ExpenseClaim("Office Supplies", 75));
+        testExpenseApproval(employee, new ExpenseClaim("Team Lunch", 300));
+        testExpenseApproval(employee, new ExpenseClaim("Conference Travel", 1500));
+        testExpenseApproval(employee, new ExpenseClaim("New Equipment", 4500));
+        testExpenseApproval(employee, new ExpenseClaim("Company Retreat", 6000));
+
+        System.out.println("All tests completed.");
+    }
+
+    private static void testExpenseApproval(Approver approver, ExpenseClaim claim) {
+        System.out.println("Processing expense: " + claim.getDescription() + " for $" + claim.getAmount());
+        
+        // Process the expense claim through the approval chain
+        approver.processExpense(claim);
+
+        // Display the result
+        System.out.println("Final status: " + claim.getStatus() + "\n");
+    }
+}
