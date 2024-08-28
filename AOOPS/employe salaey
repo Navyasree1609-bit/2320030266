@@ -1,0 +1,77 @@
+import java.util.*;
+import java.util.stream.*;
+
+// Employee class representing individual employees
+class Employee {
+    private String name;
+    private double salary;
+
+    // Constructor
+    public Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    // toString method for easy display
+    @Override
+    public String toString() {
+        return "Employee{name='" + name + "', salary=" + salary + '}';
+    }
+}
+
+public class EmployeeManagementWithStreams {
+
+    public static void main(String[] args) {
+        // Creating a list of 10 employees
+        List<Employee> employees = Arrays.asList(
+            new Employee("Alice", 70000),
+            new Employee("Bob", 50000),
+            new Employee("Charlie", 80000),
+            new Employee("David", 55000),
+            new Employee("Eva", 72000),
+            new Employee("Frank", 49000),
+            new Employee("Grace", 95000),
+            new Employee("Henry", 62000),
+            new Employee("Ivy", 88000),
+            new Employee("Jack", 67000)
+        );
+
+        // 1. Filtering employees with salary > 60000
+        System.out.println("Employees with salary greater than 60000:");
+        List<Employee> filteredEmployees = employees.stream()
+            .filter(e -> e.getSalary() > 60000)
+            .collect(Collectors.toList());
+        filteredEmployees.forEach(System.out::println);
+
+        // 2. Sorting employees by salary in ascending order
+        System.out.println("\nEmployees sorted by salary in ascending order:");
+        List<Employee> sortedEmployees = employees.stream()
+            .sorted(Comparator.comparingDouble(Employee::getSalary))
+            .collect(Collectors.toList());
+        sortedEmployees.forEach(System.out::println);
+
+        // 3. Finding the employee with the highest salary
+        System.out.println("\nEmployee with the highest salary:");
+        Employee highestSalaryEmployee = employees.stream()
+            .max(Comparator.comparingDouble(Employee::getSalary))
+            .orElseThrow(NoSuchElementException::new);
+        System.out.println(highestSalaryEmployee);
+
+        // 4. Calculating the average salary of employees
+        System.out.println("\nAverage salary of employees:");
+        double averageSalary = employees.stream()
+            .mapToDouble(Employee::getSalary)
+            .average()
+            .orElse(0.0);
+        System.out.println(averageSalary);
+    }
+}

@@ -1,0 +1,81 @@
+abstract class Approver {
+    protected Approver nextApprover;
+
+    public void setNextApprover(Approver nextApprover) {
+        this.nextApprover = nextApprover;
+    }
+
+    public void approveDiscount(double discount) {
+        if (canApprove(discount)) {
+            System.out.println(this.getClass().getSimpleName() + " approved " + discount + "% discount.");
+        } else if (nextApprover != null) {
+            nextApprover.approveDiscount(discount);
+        } else {
+            System.out.println("No one could approve " + discount + "% discount.");
+        }
+    }
+
+    protected abstract boolean canApprove(double discount);
+}
+
+class Supervisor extends Approver {
+    @Override
+    protected boolean canApprove(double discount) {
+        return discount <= 5;
+    }
+}
+
+class Manager extends Approver {
+    @Override
+    protected boolean canApprove(double discount) {
+        return discount <= 20;
+    }
+}
+
+class Director extends Approver {
+    @Override
+    protected boolean canApprove(double discount) {
+        return discount <= 50;
+    }
+}
+
+public class DiscountApprovalChain {
+    public static void main(String[] args) {
+        // Setting up the chain of responsibility
+        Approver supervisor = new Supervisor();
+        Approver manager = new Manager();
+        Approver director = new Director();
+
+        supervisor.setNextApprover(manager);
+        manager.setNextApprover(director);
+
+        // Test cases
+        runTest(supervisor, 2, "Supervisor");
+        runTest(supervisor, 10, "Manager");
+        runTest(supervisor, 30, "Director");
+        runTest(supervisor, 60, "No one");
+
+        System.out.println("All tests completed.");
+    }
+
+    private static void runTest(Approver approver, double discount, String expectedApprover) {
+        System.out.println("Testing approval for " + discount + "% discount:");
+
+        // Redirect output to capture the approver's message
+        java.io.ByteArrayOutputStream outContent = new java.io.ByteArrayOutputStream();
+        System.setOut(new java.io.PrintStream(outContent));
+
+        approver.approveDiscount(discount);
+
+        // Reset the standard output
+        System.setOut(new java.io.PrintStream(new java.io.FileOutputStream(java.io.FileDescriptor.out)));
+
+        String output = outContent.toString().trim();
+        if (expectedApprover.equals("No one")) {
+            assert output.contains("No one could approve") : "Expected no approver, but got: " + output;
+        } else {
+            assert output.contains(expectedApprover) : "Expected " + expectedApprover + " to approve, but got: " + output;
+        }
+        System.out.println("Test passed for " + discount + "% discount.\n");
+    }
+}

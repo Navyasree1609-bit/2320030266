@@ -1,0 +1,135 @@
+import java.util.*;
+
+// Employee class implementing Comparable and Cloneable
+class Employee implements Comparable<Employee>, Cloneable {
+    private int id;
+    private String name;
+    private double salary;
+
+    // Constructor
+    public Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    // toString method for easy display
+    @Override
+    public String toString() {
+        return "Employee{" + "id=" + id + ", name='" + name + '\'' + ", salary=" + salary + '}';
+    }
+
+    // Implementing compareTo for natural ordering by 'id'
+    @Override
+    public int compareTo(Employee other) {
+        return Integer.compare(this.id, other.id);
+    }
+
+    // Implementing clone method to ensure cloneability
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+
+// Comparator for sorting by name
+class EmployeeNameComparator implements Comparator<Employee> {
+    @Override
+    public int compare(Employee e1, Employee e2) {
+        return e1.getName().compareTo(e2.getName());
+    }
+}
+
+// Comparator for sorting by salary
+class EmployeeSalaryComparator implements Comparator<Employee> {
+    @Override
+    public int compare(Employee e1, Employee e2) {
+        return Double.compare(e1.getSalary(), e2.getSalary());
+    }
+}
+
+// EmployeeCollection class to support iteration functionality
+class EmployeeCollection implements Iterable<Employee> {
+    private List<Employee> employees;
+
+    // Constructor
+    public EmployeeCollection() {
+        this.employees = new ArrayList<>();
+    }
+
+    // Add an employee to the collection
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+    }
+
+    // Sort the employees using natural ordering (by id)
+    public void sortEmployees() {
+        Collections.sort(employees);
+    }
+
+    // Sort the employees using a custom comparator
+    public void sortEmployees(Comparator<Employee> comparator) {
+        Collections.sort(employees, comparator);
+    }
+
+    // Iterator for the collection
+    @Override
+    public Iterator<Employee> iterator() {
+        return employees.iterator();
+    }
+}
+
+// Main class to demonstrate the program
+public class EmployeeManagement {
+    public static void main(String[] args) {
+        // Creating the EmployeeCollection instance
+        EmployeeCollection employeeCollection = new EmployeeCollection();
+
+        // Adding employees to the collection
+        employeeCollection.addEmployee(new Employee(3, "Alice", 60000));
+        employeeCollection.addEmployee(new Employee(1, "Bob", 50000));
+        employeeCollection.addEmployee(new Employee(2, "Charlie", 70000));
+
+        // Sorting employees by natural ordering (id)
+        System.out.println("Employees sorted by ID (natural ordering):");
+        employeeCollection.sortEmployees();
+        for (Employee employee : employeeCollection) {
+            System.out.println(employee);
+        }
+
+        // Sorting employees by name using EmployeeNameComparator
+        System.out.println("\nEmployees sorted by Name:");
+        employeeCollection.sortEmployees(new EmployeeNameComparator());
+        for (Employee employee : employeeCollection) {
+            System.out.println(employee);
+        }
+
+        // Sorting employees by salary using EmployeeSalaryComparator
+        System.out.println("\nEmployees sorted by Salary:");
+        employeeCollection.sortEmployees(new EmployeeSalaryComparator());
+        for (Employee employee : employeeCollection) {
+            System.out.println(employee);
+        }
+
+        // Demonstrating cloneability
+        try {
+            Employee clonedEmployee = (Employee) new Employee(4, "David", 80000).clone();
+            System.out.println("\nCloned Employee: " + clonedEmployee);
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+    }
+}

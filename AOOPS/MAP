@@ -1,0 +1,155 @@
+import java.util.*;
+
+// Contact class representing individual contact information
+class Contact {
+    private String name;
+    private String phoneNumber;
+    private String email;
+
+    // Constructor
+    public Contact(String name, String phoneNumber, String email) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    // Overriding equals and hashCode to ensure uniqueness based on phone number and email
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Contact contact = (Contact) obj;
+        return Objects.equals(phoneNumber, contact.phoneNumber) && Objects.equals(email, contact.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(phoneNumber, email);
+    }
+
+    // toString method for easy display
+    @Override
+    public String toString() {
+        return "Contact{name='" + name + "', phoneNumber='" + phoneNumber + "', email='" + email + "'}";
+    }
+}
+
+// Contact Management System using Set and Map
+public class ContactManagementSystem {
+
+    // Set to store unique contacts
+    private Set<Contact> contacts;
+
+    // Map to store contacts by name for quick access
+    private Map<String, Contact> contactMap;
+
+    // Map to group contacts by category (family, work, etc.)
+    private Map<String, Set<Contact>> contactGroups;
+
+    // Constructor to initialize data structures
+    public ContactManagementSystem() {
+        contacts = new HashSet<>();
+        contactMap = new HashMap<>();
+        contactGroups = new HashMap<>();
+    }
+
+    // Method to add a new contact
+    public void addContact(Contact contact, String group) {
+        // Adding contact to Set for uniqueness
+        if (contacts.add(contact)) {
+            // Adding contact to Map for quick access by name
+            contactMap.put(contact.getName(), contact);
+
+            // Adding contact to its group in contactGroups Map
+            contactGroups.putIfAbsent(group, new HashSet<>());
+            contactGroups.get(group).add(contact);
+
+            System.out.println("Contact added: " + contact);
+        } else {
+            System.out.println("Contact already exists: " + contact);
+        }
+    }
+
+    // Method to remove a contact by name
+    public void removeContactByName(String name) {
+        Contact contact = contactMap.remove(name);
+        if (contact != null) {
+            contacts.remove(contact);
+            // Remove contact from all groups
+            for (Set<Contact> groupContacts : contactGroups.values()) {
+                groupContacts.remove(contact);
+            }
+            System.out.println("Contact removed: " + contact);
+        } else {
+            System.out.println("No contact found with name: " + name);
+        }
+    }
+
+    // Method to retrieve a contact by name
+    public Contact getContactByName(String name) {
+        return contactMap.get(name);
+    }
+
+    // Method to retrieve all contacts in a group
+    public Set<Contact> getContactsByGroup(String group) {
+        return contactGroups.getOrDefault(group, Collections.emptySet());
+    }
+
+    // Display all contacts
+    public void displayAllContacts() {
+        System.out.println("All Contacts:");
+        for (Contact contact : contacts) {
+            System.out.println(contact);
+        }
+    }
+
+    // Display all contacts in a specific group
+    public void displayContactsByGroup(String group) {
+        System.out.println("Contacts in group '" + group + "':");
+        for (Contact contact : getContactsByGroup(group)) {
+            System.out.println(contact);
+        }
+    }
+
+    // Main method for testing the contact management system
+    public static void main(String[] args) {
+        // Create ContactManagementSystem instance
+        ContactManagementSystem cms = new ContactManagementSystem();
+
+        // Add contacts to the system
+        cms.addContact(new Contact("Alice", "1234567890", "alice@example.com"), "family");
+        cms.addContact(new Contact("Bob", "0987654321", "bob@example.com"), "work");
+        cms.addContact(new Contact("Charlie", "1112223333", "charlie@example.com"), "family");
+
+        // Attempt to add duplicate contact
+        cms.addContact(new Contact("Alice", "1234567890", "alice@example.com"), "family");
+
+        // Display all contacts
+        cms.displayAllContacts();
+
+        // Retrieve and display a contact by name
+        System.out.println("\nRetrieved Contact by Name 'Bob': " + cms.getContactByName("Bob"));
+
+        // Display all contacts in the 'family' group
+        System.out.println();
+        cms.displayContactsByGroup("family");
+
+        // Remove a contact by name and display the updated list
+        System.out.println();
+        cms.removeContactByName("Charlie");
+        cms.displayAllContacts();
+    }
+}
