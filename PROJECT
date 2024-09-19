@@ -1,0 +1,122 @@
+import java.util.*;
+
+// Property class implementing Comparable and Cloneable
+class Property implements Comparable<Property>, Cloneable {
+    private String address;
+    private double price;
+    private String location;
+
+    public Property(String address, double price, String location) {
+        this.address = address;
+        this.price = price;
+        this.location = location;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    @Override
+    public int compareTo(Property other) {
+        return Double.compare(this.price, other.price); // Sort by price by default
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public String toString() {
+        return "Property{" +
+                "address='" + address + '\'' +
+                ", price=" + price +
+                ", location='" + location + '\'' +
+                '}';
+    }
+}
+
+// Comparator for sorting by location
+class LocationComparator implements Comparator<Property> {
+    @Override
+    public int compare(Property p1, Property p2) {
+        return p1.getLocation().compareTo(p2.getLocation());
+    }
+}
+
+// Comparator for sorting by price
+class PriceComparator implements Comparator<Property> {
+    @Override
+    public int compare(Property p1, Property p2) {
+        return Double.compare(p1.getPrice(), p2.getPrice());
+    }
+}
+
+// PropertyManager class managing the properties
+class PropertyManager {
+    private List<Property> properties;
+
+    public PropertyManager() {
+        properties = new ArrayList<>();
+    }
+
+    public void addProperty(Property property) {
+        properties.add(property);
+    }
+
+    public Iterator<Property> iterator() {
+        return properties.iterator();
+    }
+
+    public List<Property> getPropertiesSortedByLocation() {
+        properties.sort(new LocationComparator());
+        return properties;
+    }
+
+    public List<Property> getPropertiesSortedByPrice() {
+        properties.sort(new PriceComparator());
+        return properties;
+    }
+}
+
+// Main class for testing
+public class RealEstateManagement {
+    public static void main(String[] args) {
+        PropertyManager manager = new PropertyManager();
+        
+        // Add properties
+        manager.addProperty(new Property("123 Elm St", 250000, "Downtown"));
+        manager.addProperty(new Property("456 Oak St", 300000, "Uptown"));
+        manager.addProperty(new Property("789 Pine St", 200000, "Suburb"));
+
+        // Display properties sorted by price
+        System.out.println("Properties sorted by price:");
+        List<Property> sortedByPrice = manager.getPropertiesSortedByPrice();
+        for (Property property : sortedByPrice) {
+            System.out.println(property);
+        }
+
+        // Display properties sorted by location
+        System.out.println("\nProperties sorted by location:");
+        List<Property> sortedByLocation = manager.getPropertiesSortedByLocation();
+        for (Property property : sortedByLocation) {
+            System.out.println(property);
+        }
+
+        // Clone a property
+        try {
+            Property clonedProperty = (Property) sortedByPrice.get(0).clone();
+            System.out.println("\nCloned property: " + clonedProperty);
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+    }
+}
