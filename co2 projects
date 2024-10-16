@@ -1,0 +1,158 @@
+import java.util.*;
+
+// RealEstate class implementing Comparable and Cloneable interfaces
+class RealEstate implements Comparable<RealEstate>, Cloneable {
+    private String address;
+    private double price;
+    private int bedrooms;
+
+    public RealEstate(String address, double price, int bedrooms) {
+        this.address = address;
+        this.price = price;
+        this.bedrooms = bedrooms;
+    }
+
+    // Getters and Setters
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getBedrooms() {
+        return bedrooms;
+    }
+
+    public void setBedrooms(int bedrooms) {
+        this.bedrooms = bedrooms;
+    }
+
+    // Implementing Comparable interface to compare by price
+    @Override
+    public int compareTo(RealEstate other) {
+        return Double.compare(this.price, other.price);
+    }
+
+    // Implementing Cloneable interface
+    @Override
+    public RealEstate clone() throws CloneNotSupportedException {
+        return (RealEstate) super.clone();
+    }
+
+    @Override
+    public String toString() {
+        return "RealEstate{" + "address='" + address + '\'' +
+                ", price=" + price + ", bedrooms=" + bedrooms + '}';
+    }
+}
+
+// Comparator for sorting RealEstate objects
+class RealEstateComparators {
+    public static Comparator<RealEstate> byAddress = new Comparator<RealEstate>() {
+        @Override
+        public int compare(RealEstate r1, RealEstate r2) {
+            return r1.getAddress().compareTo(r2.getAddress());
+        }
+    };
+
+    public static Comparator<RealEstate> byBedrooms = new Comparator<RealEstate>() {
+        @Override
+        public int compare(RealEstate r1, RealEstate r2) {
+            return Integer.compare(r1.getBedrooms(), r2.getBedrooms());
+        }
+    };
+
+    public static Comparator<RealEstate> byPrice = new Comparator<RealEstate>() {
+        @Override
+        public int compare(RealEstate r1, RealEstate r2) {
+            return Double.compare(r1.getPrice(), r2.getPrice());
+        }
+    };
+}
+
+// Class managing the RealEstate listings and implementing Iterator
+class RealEstateListing implements Iterable<RealEstate> {
+    private List<RealEstate> listings;
+
+    public RealEstateListing() {
+        this.listings = new ArrayList<>();
+    }
+
+    public void addListing(RealEstate realEstate) {
+        listings.add(realEstate);
+    }
+
+    public void removeListing(RealEstate realEstate) {
+        listings.remove(realEstate);
+    }
+
+    @Override
+    public Iterator<RealEstate> iterator() {
+        return listings.iterator();
+    }
+
+    // Sorting methods
+    public void sortByPrice() {
+        listings.sort(RealEstateComparators.byPrice);
+    }
+
+    public void sortByAddress() {
+        listings.sort(RealEstateComparators.byAddress);
+    }
+
+    public void sortByBedrooms() {
+        listings.sort(RealEstateComparators.byBedrooms);
+    }
+}
+
+// Main class to demonstrate the functionality
+public class Main {
+    public static void main(String[] args) throws CloneNotSupportedException {
+        RealEstate r1 = new RealEstate("123 Maple St", 250000, 3);
+        RealEstate r2 = new RealEstate("456 Oak St", 320000, 4);
+        RealEstate r3 = new RealEstate("789 Pine St", 280000, 3);
+
+        RealEstateListing listing = new RealEstateListing();
+        listing.addListing(r1);
+        listing.addListing(r2);
+        listing.addListing(r3);
+
+        System.out.println("Before Sorting:");
+        for (RealEstate realEstate : listing) {
+            System.out.println(realEstate);
+        }
+
+        System.out.println("\nSorted by Price:");
+        listing.sortByPrice();
+        for (RealEstate realEstate : listing) {
+            System.out.println(realEstate);
+        }
+
+        System.out.println("\nSorted by Address:");
+        listing.sortByAddress();
+        for (RealEstate realEstate : listing) {
+            System.out.println(realEstate);
+        }
+
+        System.out.println("\nSorted by Bedrooms:");
+        listing.sortByBedrooms();
+        for (RealEstate realEstate : listing) {
+            System.out.println(realEstate);
+        }
+
+        // Demonstrating cloning
+        RealEstate r1Clone = r1.clone();
+        System.out.println("\nCloned Listing:");
+        System.out.println(r1Clone);
+    }
+}
